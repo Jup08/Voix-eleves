@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voix d'élèves — Université Champollion · Albi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:   #F4F1F9;
+      --ink:  #1A1040;
+      --gold: #C9950C;
+      --gold-pale: #F5D97A;
+
+      --c1: #3B5FC0;
+      --c2: #A85610;
+      --c3: #6B3FA0;
+      --c4: #1A7A5E;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--ink);
+      color: #fff;
+      padding: 3rem 1.5rem 3.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,149,12,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Cartouche SVG Champollion */
+    .cartouche-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .cartouche-wrap svg { overflow: visible; }
+
+    .hero-eyebrow {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--gold-pale);
+      margin-bottom: .75rem;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 8vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold-pale);
+    }
+    .hero p {
+      font-size: .95rem;
+      opacity: .7;
+      line-height: 1.65;
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── RAINBOW STRIPE ── */
+    .stripe {
+      height: 5px;
+      background: linear-gradient(to right, var(--c1) 25%, var(--c2) 25% 50%, var(--c3) 50% 75%, var(--c4) 75%);
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding: 2.25rem 1.25rem 1rem;
+      max-width: 660px;
+      margin: 0 auto;
+    }
+    .section + .section {
+      border-top: 1px solid rgba(26,16,64,.07);
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: .85rem;
+      margin-bottom: .5rem;
+    }
+    .section-pip {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .section-rule {
+      height: 2px;
+      border-radius: 2px;
+      margin-bottom: 1.25rem;
+      opacity: .2;
+    }
+
+    /* ── AUDIO CARDS ── */
+    .audio-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem 1.125rem;
+      margin-bottom: .7rem;
+      box-shadow: 0 1px 4px rgba(26,16,64,.06);
+    }
+    .card-label {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      opacity: .5;
+      margin-bottom: .65rem;
+    }
+
+    /* ── PLAYER ── */
+    .player {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .play-btn {
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .15s, filter .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .play-btn:hover  { filter: brightness(1.1); }
+    .play-btn:active { transform: scale(.94); }
+    .play-btn svg    { width: 17px; height: 17px; fill: #fff; pointer-events: none; }
+
+    .player-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+    .progress-wrap {
+      position: relative;
+      height: 5px;
+      background: rgba(26,16,64,.1);
+      border-radius: 5px;
+      cursor: pointer;
+      touch-action: none;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 5px;
+      width: 0%;
+      transition: width .1s linear;
+      pointer-events: none;
+    }
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: .7rem;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+      opacity: .45;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 2.5rem 1rem 3rem;
+      font-size: .72rem;
+      color: rgba(26,16,64,.4);
+      border-top: 1px solid rgba(26,16,64,.07);
+      margin-top: 1.5rem;
+    }
+    .footer strong { font-weight: 600; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .play-btn, .progress-fill { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HERO ══════════════════════════════════ -->
+<header class="hero">
+
+  <!-- Cartouche égyptien — hommage à Jean-François Champollion -->
+  <div class="cartouche-wrap" aria-hidden="true">
+    <svg width="52" height="100" viewBox="0 0 52 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Contour cartouche -->
+      <rect x="3" y="3" width="46" height="72" rx="23" stroke="#C9950C" stroke-width="2.2"/>
+      <!-- Base du cartouche (ligne de fermeture) -->
+      <rect x="3" y="78" width="46" height="9" rx="4.5" stroke="#C9950C" stroke-width="2.2" fill="none"/>
+      <!-- Hiéroglyphes stylisés (décoratifs) -->
+      <circle cx="26" cy="20" r="5.5" stroke="#C9950C" stroke-width="1.6" fill="none" opacity=".7"/>
+      <line x1="26" y1="28" x2="26" y2="36" stroke="#C9950C" stroke-width="1.6" opacity=".7"/>
+      <rect x="18" y="40" width="8" height="10" rx="2" stroke="#C9950C" stroke-width="1.4" fill="none" opacity=".6"/>
+      <line x1="30" y1="40" x2="30" y2="50" stroke="#C9950C" stroke-width="1.6" opacity=".6"/>
+      <line x1="27" y1="44" x2="34" y2="44" stroke="#C9950C" stroke-width="1.4" opacity=".6"/>
+      <line x1="26" y1="56" x2="26" y2="66" stroke="#C9950C" stroke-width="1.6" opacity=".5"/>
+      <line x1="19" y1="62" x2="33" y2="62" stroke="#C9950C" stroke-width="1.4" opacity=".5"/>
+      <circle cx="19" cy="59" r="2" fill="#C9950C" opacity=".4"/>
+      <circle cx="33" cy="65" r="2" fill="#C9950C" opacity=".4"/>
+    </svg>
+  </div>
+
+  <p class="hero-eyebrow">Université Jean-François Champollion · Albi</p>
+  <h1>Voix d'<em>élèves</em></h1>
+  <p>Quatre thèmes, des paroles authentiques. Appuyez sur lecture pour entendre leurs témoignages.</p>
+</header>
+
+<div class="stripe"></div>
+
+<main>
+
+  <!-- ════════════ THÈME 1 ════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-pip" style="background:var(--c1)"></span>
+      <h2 class="section-title" style="color:var(--c1)">La vie étudiante</h2>
+    </div>
+    <div class="section-rule" style="background:var(--c1)"></div>
+
+    <!--
+    ╔══════════════════════════════════════════╗
+    ║  INSTRUCTIONS POUR AJOUTER TES AUDIOS   ║
+    ║  • Place tes fichiers .mp3 dans :        ║
+    ║    /audio/vie-etudiante-1.mp3, etc.      ║
+    ║  • Change le data-src de chaque carte    ║
+    ║  • Change "Témoignage 1" par le prénom   ║
+    ║    ou un titre si tu préfères            ║
+    ║  • Copie/colle une .audio-card pour      ║
+    ║    ajouter d'autres élèves               ║
+    ╚══════════════════════════════════════════╝
+    -->
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 1</div>
+      <div class="player" data-src="audio/vie-etudiante-1.mp3">
+        <button class="play-btn" style="background:var(--c1)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c1)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 2</div>
+      <div class="player" data-src="audio/vie-etudiante-2.mp3">
+        <button class="play-btn" style="background:var(--c1)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c1)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 3</div>
+      <div class="player" data-src="audio/vie-etudiante-3.mp3">
+        <button class="play-btn" style="background:var(--c1)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c1)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════ THÈME 2 ════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-pip" style="background:var(--c2)"></span>
+      <h2 class="section-title" style="color:var(--c2)">La visite de Champollion</h2>
+    </div>
+    <div class="section-rule" style="background:var(--c2)"></div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 1</div>
+      <div class="player" data-src="audio/visite-champollion-1.mp3">
+        <button class="play-btn" style="background:var(--c2)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c2)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 2</div>
+      <div class="player" data-src="audio/visite-champollion-2.mp3">
+        <button class="play-btn" style="background:var(--c2)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c2)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 3</div>
+      <div class="player" data-src="audio/visite-champollion-3.mp3">
+        <button class="play-btn" style="background:var(--c2)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c2)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════ THÈME 3 ════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-pip" style="background:var(--c3)"></span>
+      <h2 class="section-title" style="color:var(--c3)">La rencontre avec les tutrices</h2>
+    </div>
+    <div class="section-rule" style="background:var(--c3)"></div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 1</div>
+      <div class="player" data-src="audio/tutrices-1.mp3">
+        <button class="play-btn" style="background:var(--c3)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c3)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 2</div>
+      <div class="player" data-src="audio/tutrices-2.mp3">
+        <button class="play-btn" style="background:var(--c3)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c3)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 3</div>
+      <div class="player" data-src="audio/tutrices-3.mp3">
+        <button class="play-btn" style="background:var(--c3)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c3)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════ THÈME 4 ════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-pip" style="background:var(--c4)"></span>
+      <h2 class="section-title" style="color:var(--c4)">Les ressentis</h2>
+    </div>
+    <div class="section-rule" style="background:var(--c4)"></div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 1</div>
+      <div class="player" data-src="audio/ressentis-1.mp3">
+        <button class="play-btn" style="background:var(--c4)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c4)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 2</div>
+      <div class="player" data-src="audio/ressentis-2.mp3">
+        <button class="play-btn" style="background:var(--c4)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c4)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="audio-card">
+      <div class="card-label">Témoignage 3</div>
+      <div class="player" data-src="audio/ressentis-3.mp3">
+        <button class="play-btn" style="background:var(--c4)" aria-label="Lire">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="player-body">
+          <div class="progress-wrap" role="slider" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="progress-fill" style="background:var(--c4)"></div>
+          </div>
+          <div class="time-row"><span class="cur">0:00</span><span class="dur">–:––</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <strong>Université Jean-François Champollion</strong> · Albi<br>
+  Projet lycéen — Lycée Bellevue
+</footer>
+
+<script>
+  function fmt(s) {
+    if (!s || isNaN(s) || !isFinite(s)) return '–:––';
+    const m = Math.floor(s / 60);
+    const sec = String(Math.floor(s % 60)).padStart(2, '0');
+    return m + ':' + sec;
+  }
+
+  let activeAudio = null;
+  let activeBtn   = null;
+
+  const PLAY_PATH  = 'M8 5v14l11-7z';
+  const PAUSE_PATH = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+
+  document.querySelectorAll('.player').forEach(function(player) {
+    const src   = player.dataset.src;
+    const btn   = player.querySelector('.play-btn');
+    const icon  = btn.querySelector('svg path');
+    const wrap  = player.querySelector('.progress-wrap');
+    const fill  = player.querySelector('.progress-fill');
+    const cur   = player.querySelector('.cur');
+    const dur   = player.querySelector('.dur');
+    let audio   = null;
+
+    function load() {
+      if (audio) return;
+      audio = new Audio(src);
+      audio.preload = 'metadata';
+      audio.addEventListener('loadedmetadata', function() {
+        dur.textContent = fmt(audio.duration);
+      });
+      audio.addEventListener('timeupdate', function() {
+        if (!audio.duration) return;
+        var pct = (audio.currentTime / audio.duration) * 100;
+        fill.style.width = pct + '%';
+        wrap.setAttribute('aria-valuenow', Math.round(pct));
+        cur.textContent = fmt(audio.currentTime);
+      });
+      audio.addEventListener('ended', function() {
+        icon.setAttribute('d', PLAY_PATH);
+        fill.style.width = '0%';
+        cur.textContent = '0:00';
+        activeAudio = null;
+        activeBtn   = null;
+      });
+    }
+
+    btn.addEventListener('click', function() {
+      load();
+      if (activeAudio && activeAudio !== audio) {
+        activeAudio.pause();
+        activeBtn.querySelector('svg path').setAttribute('d', PLAY_PATH);
+      }
+      if (audio.paused) {
+        audio.play();
+        icon.setAttribute('d', PAUSE_PATH);
+        activeAudio = audio;
+        activeBtn   = btn;
+      } else {
+        audio.pause();
+        icon.setAttribute('d', PLAY_PATH);
+        activeAudio = null;
+        activeBtn   = null;
+      }
+    });
+
+    function seek(e) {
+      load();
+      var rect = wrap.getBoundingClientRect();
+      var x    = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      var pct  = Math.max(0, Math.min(1, x / rect.width));
+      if (audio.duration) {
+        audio.currentTime = pct * audio.duration;
+        fill.style.width  = (pct * 100) + '%';
+      }
+    }
+
+    var dragging = false;
+    wrap.addEventListener('mousedown', function(e) { dragging = true; seek(e); });
+    document.addEventListener('mousemove', function(e) { if (dragging) seek(e); });
+    document.addEventListener('mouseup', function() { dragging = false; });
+    wrap.addEventListener('touchstart', seek, { passive: true });
+    wrap.addEventListener('touchmove', seek, { passive: true });
+
+    wrap.addEventListener('keydown', function(e) {
+      load();
+      if (!audio.duration) return;
+      var step = audio.duration * 0.05;
+      if (e.key === 'ArrowRight') { audio.currentTime = Math.min(audio.duration, audio.currentTime + step); }
+      if (e.key === 'ArrowLeft')  { audio.currentTime = Math.max(0, audio.currentTime - step); }
+    });
+  });
+</script>
+</body>
+</html>
